@@ -35,18 +35,18 @@
 		</dependency>
 		<dependency>
 			<groupId>com.bucket4j</groupId>
-			<artifactId>bucket4j_jdk8-core</artifactId>
-			<version>8.1.0</version>
+			<artifactId>bucket4j-core</artifactId>
+			<version>8.1.1</version>
 		</dependency>
 		<dependency>
 			<groupId>com.bucket4j</groupId>
-			<artifactId>bucket4j_jdk8-hazelcast</artifactId>
-			<version>8.1.0</version>
+			<artifactId>bucket4j-hazelcast</artifactId>
+			<version>8.1.1</version>
 		</dependency>
 		<dependency>
 			<groupId>com.bucket4j</groupId>
-			<artifactId>bucket4j_jdk8-jcache</artifactId>
-			<version>8.1.0</version>
+			<artifactId>bucket4j-jcache</artifactId>
+			<version>8.1.1</version>
 		</dependency>
 
 		<dependency>
