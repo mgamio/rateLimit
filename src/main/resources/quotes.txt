@@ -1,0 +1,6 @@
+Systems should be build to do useful things for real people;Prof. Roger Needham
+Before software should be reusable, it should be usable;Ralph Johnson
+A good programmer is someone who always looks both ways before crossing a one-way street;Doug Linder, computer scientist
+Most of the good programmers do programming not because they expect to get paid or get adulation by the public, but because it is fun to program;Linus Torvalds
+Coding is today the language of creativity. All our children deserve a chance to become creators instead of consumers of computer science;Maria Klawe
+The most flexible systems are those in which source code dependencies refer only to abstractions, not to concretions;Robert Martin
