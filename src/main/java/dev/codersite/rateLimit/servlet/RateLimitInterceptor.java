@@ -22,12 +22,14 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class RateLimitInterceptor implements HandlerInterceptor {
   private static final Logger logger = LoggerFactory.getLogger(RateLimitInterceptor.class);
-  private final long tokensToConsumeDefault = 1;
 
   private final Map<String, Bucket> buckets = new ConcurrentHashMap<>();
+  private final long tokensToConsumeByDefault = 1;
+  private long capacity = 10;
+  private long tokens = 10;
 
-  private final Bucket freeBucket = Bucket.builder()
-      .addLimit(Bandwidth.classic(10, Refill.intervally(10, Duration.ofMinutes(1))))
+  private final Bucket defaultBucket = Bucket.builder()
+      .addLimit(Bandwidth.classic(capacity, Refill.intervally(tokens, Duration.ofMinutes(1))))
       .build();
 
   public RateLimitInterceptor() {}
@@ -35,18 +37,18 @@ public class RateLimitInterceptor implements HandlerInterceptor {
   @Override
   public boolean preHandle(HttpServletRequest request, HttpServletResponse response,
                            Object handler) throws Exception {
-    String remoteAddress = getClientIP(request);
-    logger.info(remoteAddress);
+    String clientIP = getClientIP(request);
+    logger.info(clientIP);
 
-    Bucket requestBucket;
-    if (buckets.containsKey(remoteAddress)) {
-      requestBucket = buckets.get(remoteAddress);
+    Bucket bucketByClientIP;
+    if (buckets.containsKey(clientIP)) {
+      bucketByClientIP = buckets.get(clientIP);
     } else {
-      requestBucket = this.freeBucket;
-      buckets.put(remoteAddress, requestBucket);
+      bucketByClientIP = this.defaultBucket;
+      buckets.put(clientIP, bucketByClientIP);
     }
 
-    ConsumptionProbe probe = requestBucket.tryConsumeAndReturnRemaining(this.tokensToConsumeDefault);
+    ConsumptionProbe probe = bucketByClientIP.tryConsumeAndReturnRemaining(this.tokensToConsumeByDefault);
     if (probe.isConsumed()) {
       response.addHeader("X-Rate-Limit-Remaining",
           Long.toString(probe.getRemainingTokens()));
@@ -58,8 +60,8 @@ public class RateLimitInterceptor implements HandlerInterceptor {
         Long.toString(TimeUnit.NANOSECONDS.toMillis(probe.getNanosToWaitForRefill())));
 
     return false;
-
   }
+
   private String getClientIP(HttpServletRequest request) {
     String ip = request.getHeader("X-FORWARDED-FOR");
 
