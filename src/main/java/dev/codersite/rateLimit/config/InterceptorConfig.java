@@ -1,26 +1,21 @@
 package dev.codersite.rateLimit.config;
 
 import dev.codersite.rateLimit.servlet.RateLimitInterceptor;
-import io.github.bucket4j.Bandwidth;
-import io.github.bucket4j.Bucket;
-import io.github.bucket4j.Refill;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
-
-import java.time.Duration;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
-public class InterceptorConfig extends WebMvcConfigurerAdapter {
+public class InterceptorConfig implements WebMvcConfigurer {
 
-  @Autowired
-  RateLimitInterceptor rateLimitInterceptor;
+  private final RateLimitInterceptor rateLimitInterceptor;
+
+  public InterceptorConfig(RateLimitInterceptor rateLimitInterceptor) {
+    this.rateLimitInterceptor = rateLimitInterceptor;
+  }
 
   @Override
   public void addInterceptors(InterceptorRegistry registry) {
-    registry.addInterceptor(rateLimitInterceptor);
+    registry.addInterceptor(rateLimitInterceptor).addPathPatterns("/v1/**");
   }
-
 }

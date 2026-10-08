@@ -1,42 +1,42 @@
 package dev.codersite.rateLimit.repository;
 
 import dev.codersite.rateLimit.model.Quote;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
+import org.springframework.stereotype.Repository;
 
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.io.InputStreamReader;
+import java.io.UncheckedIOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
+@Repository
 public class QuoteRepositoryImpl implements QuoteRepository {
 
-  private static final Logger logger = LoggerFactory.getLogger(QuoteRepositoryImpl.class);
+  private final List<Quote> quotes;
+
+  public QuoteRepositoryImpl() {
+    this.quotes = loadQuotes("quotes.txt");
+  }
 
   @Override
-  public Map<Integer, Quote> getAllQuotes() throws Exception {
-    Map<Integer, Quote> quotes = new ConcurrentHashMap<>();
-    Resource resource = new ClassPathResource("quotes.txt");
-    try {
-      List<String> allLines = Files.readAllLines(Paths.get(resource.getURI()));
-      int n = 1;
-      for (String line: allLines) {
-        logger.info(line);
-        String[] attributes = line.split(";");
-        Quote quote = new Quote();
-        quote.setMessage(attributes[0]);
-        quote.setAuthor(attributes[1]);
-        quotes.put(n++, quote);
-      }
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-    logger.info("nro quotes: " + quotes.size());
+  public List<Quote> findAll() {
     return quotes;
   }
 
+  // Each line of the file is "message;author"
+  private static List<Quote> loadQuotes(String fileName) {
+    ClassPathResource resource = new ClassPathResource(fileName);
+    try (BufferedReader reader = new BufferedReader(
+        new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8))) {
+      return reader.lines()
+          .filter(line -> !line.isBlank())
+          .map(line -> line.split(";", 2))
+          .map(parts -> new Quote(parts[0].trim(), parts[1].trim()))
+          .toList();
+    } catch (IOException e) {
+      throw new UncheckedIOException("Cannot read " + fileName, e);
+    }
+  }
 }

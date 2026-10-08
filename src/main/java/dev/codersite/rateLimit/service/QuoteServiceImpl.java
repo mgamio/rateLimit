@@ -1,24 +1,24 @@
 package dev.codersite.rateLimit.service;
 
 import dev.codersite.rateLimit.model.Quote;
-import org.springframework.beans.factory.annotation.Autowired;
+import dev.codersite.rateLimit.repository.QuoteRepository;
+import org.springframework.stereotype.Service;
 
-import java.util.Map;
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
+@Service
 public class QuoteServiceImpl implements QuoteService {
 
-  @Autowired
-  private Map<Integer, Quote> mapOfQuotes;
+  private final QuoteRepository quoteRepository;
+
+  public QuoteServiceImpl(QuoteRepository quoteRepository) {
+    this.quoteRepository = quoteRepository;
+  }
 
   @Override
-  public Quote getRandomQuote() throws Exception {
-    int n = getRandomNumber(1, mapOfQuotes.size());
-    return mapOfQuotes.get(n);
+  public Quote getRandomQuote() {
+    List<Quote> quotes = quoteRepository.findAll();
+    return quotes.get(ThreadLocalRandom.current().nextInt(quotes.size()));
   }
-
-  private int getRandomNumber(int min, int max) {
-    return ThreadLocalRandom.current().nextInt(min, max + 1);
-  }
-
 }

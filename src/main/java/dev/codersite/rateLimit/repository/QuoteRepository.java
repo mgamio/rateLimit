@@ -2,8 +2,8 @@ package dev.codersite.rateLimit.repository;
 
 import dev.codersite.rateLimit.model.Quote;
 
-import java.util.Map;
+import java.util.List;
 
 public interface QuoteRepository {
-  public Map<Integer, Quote> getAllQuotes() throws Exception;
+  List<Quote> findAll();
 }
